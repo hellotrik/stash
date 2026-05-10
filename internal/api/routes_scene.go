@@ -4,12 +4,15 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/stashapp/stash/internal/api/urlbuilders"
 	"github.com/stashapp/stash/internal/manager"
 	"github.com/stashapp/stash/internal/manager/config"
 	"github.com/stashapp/stash/internal/static"
@@ -54,6 +57,8 @@ type sceneRoutes struct {
 
 func (rs sceneRoutes) Routes() chi.Router {
 	r := chi.NewRouter()
+
+	r.Get("/playlist.m3u", rs.ScenePlaylistM3U)
 
 	r.Route("/{sceneId}", func(r chi.Router) {
 		r.Use(rs.SceneCtx)
@@ -528,6 +533,91 @@ func (rs sceneRoutes) SceneMarkerPreview(w http.ResponseWriter, r *http.Request)
 	} else {
 		utils.ServeStaticFile(w, r, filepath)
 	}
+}
+
+// ScenePlaylistM3U writes an HLS-style extended M3U playlist listing stream URLs for the given scene ids.
+// External players (e.g. IINA via iina://weblink) fetch this URL over HTTP, then follow each entry URL;
+// api key must appear on those stream URLs when authentication is enabled (handled by GetStreamURL).
+func (rs sceneRoutes) ScenePlaylistM3U(w http.ResponseWriter, r *http.Request) {
+	baseURL := r.Context().Value(BaseURLCtxKey).(string)
+	apiKey := manager.GetInstance().Config.GetAPIKey()
+
+	raw := strings.TrimSpace(r.URL.Query().Get("ids"))
+	if raw == "" {
+		http.Error(w, "missing ids query parameter", http.StatusBadRequest)
+		return
+	}
+
+	parts := strings.Split(raw, ",")
+	const maxPlaylistIDs = 500
+	if len(parts) > maxPlaylistIDs {
+		http.Error(w, fmt.Sprintf("too many ids (max %d)", maxPlaylistIDs), http.StatusBadRequest)
+		return
+	}
+
+	type playlistEntry struct {
+		title string
+		url   string
+	}
+
+	var entries []playlistEntry
+	readErr := rs.withReadTxn(r, func(ctx context.Context) error {
+		for _, p := range parts {
+			p = strings.TrimSpace(p)
+			if p == "" {
+				continue
+			}
+			id, err := strconv.Atoi(p)
+			if err != nil || id <= 0 {
+				continue
+			}
+			scene, err := rs.sceneFinder.Find(ctx, id)
+			if err != nil || scene == nil {
+				continue
+			}
+			if err := scene.LoadPrimaryFile(ctx, rs.fileGetter); err != nil {
+				continue
+			}
+			vf := scene.Files.Primary()
+			if vf == nil || vf.Path == "" {
+				continue
+			}
+			title := strings.TrimSpace(scene.Title)
+			if title == "" {
+				title = filepath.Base(vf.Path)
+			}
+			title = strings.ReplaceAll(title, "\n", " ")
+			title = strings.ReplaceAll(title, ",", " ")
+			streamURL := urlbuilders.NewSceneURLBuilder(baseURL, scene).GetStreamURL(apiKey).String()
+			entries = append(entries, playlistEntry{title: title, url: streamURL})
+		}
+		return nil
+	})
+	if errors.Is(readErr, context.Canceled) {
+		return
+	}
+	if readErr != nil {
+		logger.Warnf("read transaction error on scene playlist: %v", readErr)
+		http.Error(w, readErr.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if len(entries) == 0 {
+		http.Error(w, "no playable scenes found for given ids", http.StatusNotFound)
+		return
+	}
+
+	var buf bytes.Buffer
+	buf.WriteString("#EXTM3U\n")
+	for _, e := range entries {
+		buf.WriteString(fmt.Sprintf("#EXTINF:-1,%s\n", e.title))
+		buf.WriteString(e.url)
+		buf.WriteString("\n")
+	}
+
+	w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
+	w.Header().Set("Cache-Control", "no-store")
+	_, _ = w.Write(buf.Bytes())
 }
 
 func (rs sceneRoutes) SceneMarkerScreenshot(w http.ResponseWriter, r *http.Request) {

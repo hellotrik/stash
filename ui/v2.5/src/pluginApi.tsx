@@ -119,6 +119,8 @@ export const PluginApi = {
 
     ExternalPlayerButton: () =>
       import("./components/Scenes/SceneDetails/ExternalPlayerButton"),
+    DesktopExternalPlaylistButton: () =>
+      import("./components/Scenes/SceneDetails/DesktopExternalPlaylistButton"),
     QueueViewer: () => import("./components/Scenes/SceneDetails/QueueViewer"),
     SceneMarkersPanel: () =>
       import("./components/Scenes/SceneDetails/SceneMarkersPanel"),
