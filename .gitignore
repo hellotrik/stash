@@ -35,7 +35,6 @@ ui/login/locales/*
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
-.vscode
 .devcontainer
 
 # Generated files

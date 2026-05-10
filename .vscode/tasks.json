@@ -1,0 +1,193 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "identifier": "stash-pre-ui",
+      "label": "安装前端依赖",
+      "type": "shell",
+      "command": "make pre-ui",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "icon": {
+        "id": "tools",
+        "tooltip": "pnpm：首次克隆或依赖变更后执行"
+      },
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "identifier": "stash-generate",
+      "label": "生成 GraphQL 等",
+      "type": "shell",
+      "command": "make generate",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "icon": {
+        "id": "refresh",
+        "tooltip": "需先执行 pre-ui"
+      },
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "identifier": "stash-server-start",
+      "label": "server-start.local",
+      "type": "shell",
+      "command": "make server-start",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "stash-server",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "stash is listening on .+"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      },
+      "icon": {
+        "id": "debug",
+        "tooltip": "默认 http://localhost:9999；Ctrl+C 停止"
+      },
+      "group": "none"
+    },
+    {
+      "identifier": "stash-ui-start",
+      "label": "ui-start.vite",
+      "type": "shell",
+      "command": "make ui-start",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "stash-vite",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": ".+Local:.+"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      },
+      "icon": {
+        "id": "play",
+        "tooltip": "默认 http://localhost:3000；需后端已启动"
+      },
+      "group": "none"
+    },
+    {
+      "identifier": "stash-ui-build",
+      "label": "ui.build",
+      "type": "shell",
+      "command": "make ui",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "icon": {
+        "id": "zap",
+        "tooltip": "发布/本地单二进制前需要"
+      },
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "identifier": "stash-build-release",
+      "label": "build-release.release",
+      "type": "shell",
+      "command": "make build-release",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "icon": {
+        "id": "rocket",
+        "tooltip": "生成 stash / phasher"
+      },
+      "problemMatcher": "$go",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "identifier": "stash-macapp",
+      "label": "macapp.Stash.app",
+      "type": "shell",
+      "command": "make stash-macapp",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "icon": {
+        "id": "gift",
+        "tooltip": "仅 macOS：生成项目根目录 Stash.app；请先 make ui（或 make release）嵌入前端"
+      },
+      "problemMatcher": "$go",
+      "group": "build"
+    },
+    {
+      "identifier": "stash-fmt",
+      "label": "fmt.go",
+      "type": "shell",
+      "command": "make fmt",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "icon": {
+        "id": "gear",
+        "tooltip": "go fmt"
+      },
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "identifier": "stash-fmt-ui",
+      "label": "fmt-ui.ui",
+      "type": "shell",
+      "command": "make fmt-ui",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "icon": {
+        "id": "gear",
+        "tooltip": "ui/v2.5"
+      },
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "identifier": "stash-server-clean",
+      "label": "server-clean.local",
+      "type": "shell",
+      "command": "make server-clean",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "icon": {
+        "id": "folder-opened",
+        "tooltip": "清空本地开发配置与数据库"
+      },
+      "problemMatcher": [],
+      "group": "none"
+    }
+  ]
+}
