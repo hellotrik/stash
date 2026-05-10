@@ -1,6 +1,12 @@
+import cloneDeep from "lodash-es/cloneDeep";
 import { getPlatformURL } from "src/core/createClient";
+import { queryFindScenesForSelect } from "src/core/StashService";
 import { objectTitle } from "src/core/files";
+import type { ListFilterModel } from "src/models/list-filter/filter";
 import type { QueuedScene } from "src/models/sceneQueue";
+
+/** 与后端 `ScenePlaylistM3U` 的 ids 上限一致。 */
+export const MAX_HOSTED_PLAYLIST_SCENES = 500;
 
 /** 将 Stash 返回的 stream 路径解析为可在 IINA/VLC 等外部播放器中请求的绝对 URL。 */
 export function absoluteStreamUrl(stream: string): string {
@@ -81,4 +87,42 @@ export function copyApiKeyFromSampleStream(
   } catch {
     return targetUrl;
   }
+}
+
+/** 从多条场景记录中取第一条可用的 `paths.stream`，用于抽取 `apikey`。 */
+export function pickSampleStreamUrlFromScenes(
+  scenes: { paths?: { stream?: string | null } | null }[]
+): string | undefined {
+  for (const s of scenes) {
+    const stream = s.paths?.stream;
+    if (stream) return stream;
+  }
+  return undefined;
+}
+
+/**
+ * 按当前列表筛选条件分页拉取场景 id，最多 `maxIds` 条（顺序与列表排序一致）。
+ */
+export async function fetchSceneIdsForPlaylist(
+  filter: ListFilterModel,
+  maxIds: number
+): Promise<string[]> {
+  const ids: string[] = [];
+  const perPage = Math.min(250, maxIds);
+  let page = 1;
+  while (ids.length < maxIds) {
+    const f = cloneDeep(filter);
+    f.currentPage = page;
+    f.itemsPerPage = perPage;
+    const res = await queryFindScenesForSelect(f);
+    const scenes = res.data?.findScenes?.scenes ?? [];
+    if (scenes.length === 0) break;
+    for (const s of scenes) {
+      ids.push(s.id);
+      if (ids.length >= maxIds) break;
+    }
+    if (scenes.length < perPage) break;
+    page++;
+  }
+  return ids;
 }

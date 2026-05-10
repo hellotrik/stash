@@ -84,6 +84,7 @@
     "next_action": "Next",
     "not_running": "not running",
     "open_playlist_in_iina": "Open queue playlist in IINA",
+    "open_scene_list_in_iina": "Open list in IINA (hosted M3U)",
     "open_in_external_player": "Open in external player",
     "open_random": "Open Random",
     "optimise_database": "Optimise database",
@@ -1696,7 +1697,11 @@
     "started_auto_tagging": "Started auto tagging",
     "started_generating": "Started generating",
     "started_importing": "Started importing",
-    "updated_entity": "Updated {entity}"
+    "updated_entity": "Updated {entity}",
+    "iina_playlist_truncated": "Only the first {max} scenes were included (playlist limit).",
+    "iina_no_playable_scenes": "No playable scenes found for this choice.",
+    "iina_popup_fallback_hint": "If IINA did not open, allow pop-ups for this site and try again.",
+    "iina_placeholder_window_message": "Opening IINA…"
   },
   "total": "Total",
   "true": "True",

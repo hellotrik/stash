@@ -275,6 +275,8 @@ export const ListOperations: React.FC<{
   onEdit?: () => void;
   onDelete?: () => void;
   onPlay?: () => void;
+  /** Rendered inside the toolbar button group immediately after the play button. */
+  afterPlayButtons?: React.ReactNode;
   operationsClassName?: string;
   operationsMenuClassName?: string;
 }> = ({
@@ -284,6 +286,7 @@ export const ListOperations: React.FC<{
   onEdit,
   onDelete,
   onPlay,
+  afterPlayButtons,
   operationsClassName = "list-operations",
   operationsMenuClassName,
 }) => {
@@ -359,6 +362,9 @@ export const ListOperations: React.FC<{
       ) : null;
 
     addButton(playButton);
+    if (afterPlayButtons) {
+      ret.push(afterPlayButtons);
+    }
     addButton(editButton);
     addButton(deleteButton);
 
@@ -381,7 +387,16 @@ export const ListOperations: React.FC<{
     }
 
     return ret;
-  }, [operations, hasSelection, onDelete, onEdit, onPlay, items, intl]);
+  }, [
+    operations,
+    hasSelection,
+    onDelete,
+    onEdit,
+    onPlay,
+    items,
+    intl,
+    afterPlayButtons,
+  ]);
 
   if (dropdownOperations.length === 0 && !buttons) {
     return null;

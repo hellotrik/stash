@@ -20,6 +20,7 @@ import { TaggerContext } from "../Tagger/context";
 import { IdentifyDialog } from "../Dialogs/IdentifyDialog/IdentifyDialog";
 import { useConfigurationContext } from "src/hooks/Config";
 import { SceneMergeModal } from "./SceneMergeDialog";
+import { SceneListExternalIinaButton } from "./SceneListExternalIinaButton";
 import { objectTitle } from "src/core/files";
 import TextUtils from "src/utils/text";
 import { View } from "../List/views";
@@ -634,6 +635,16 @@ export const FilteredSceneList = PatchComponent(
         onEdit={onEdit}
         onDelete={onDelete}
         onPlay={onPlay}
+        afterPlayButtons={
+          <SceneListExternalIinaButton
+            effectiveFilter={effectiveFilter}
+            items={items}
+            selectedIds={selectedIds}
+            selectedItems={selectedItems}
+            hasSelection={hasSelection}
+            totalCount={totalCount}
+          />
+        }
         operationsMenuClassName="scene-list-operations-dropdown"
       />
     );

@@ -64,6 +64,7 @@
         "next_action": "下一步",
         "not_running": "未运行",
         "open_playlist_in_iina": "用 IINA 打开队列播放列表",
+        "open_scene_list_in_iina": "用 IINA 打开当前列表（托管 M3U）",
         "open_in_external_player": "由外部播放器打开",
         "open_random": "开启随机",
         "overwrite": "覆盖",
@@ -1488,7 +1489,11 @@
         "merged_performers": "合并的表演者",
         "clipboard_access_denied": "剪贴板访问受阻。检查你浏览器的权限",
         "clipboard_image_pasted": "粘贴剪贴板图像",
-        "clipboard_no_image": "没有图像在剪贴板中找到"
+        "clipboard_no_image": "没有图像在剪贴板中找到",
+        "iina_playlist_truncated": "仅包含前 {max} 个短片（播放列表上限）。",
+        "iina_no_playable_scenes": "没有可播放的短片。",
+        "iina_popup_fallback_hint": "若未唤起 IINA，请允许本站弹出窗口后重试。",
+        "iina_placeholder_window_message": "正在打开 IINA…"
     },
     "total": "总计",
     "true": "是",
