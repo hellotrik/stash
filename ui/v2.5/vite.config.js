@@ -24,6 +24,22 @@ export default defineConfig(() => {
 
   return {
     base: "",
+    // Bootstrap 4 SCSS + legacy @import chains trigger Dart Sass deprecations until Bootstrap/API upgrades.
+    // quietDeps silences warnings originating under node_modules; silenceDeprecations covers first-party @import.
+    css: {
+      preprocessorOptions: {
+        scss: {
+          quietDeps: true,
+          silenceDeprecations: [
+            "import",
+            "global-builtin",
+            "color-functions",
+            "if-function",
+            "abs-percent",
+          ],
+        },
+      },
+    },
     build: {
       outDir: "build",
       sourcemap: sourcemap,
